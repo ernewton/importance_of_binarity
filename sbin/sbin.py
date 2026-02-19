@@ -29,8 +29,8 @@ def suppression_factor_50(a_values):
     return results
 
 def suppression_factor_simple(a_values):
-    a_inner_true = 10  # AU (suppression 100%)
-    a_outer_true = 200  # AU (suppression 0%)
+    a_inner_true = 15  # AU (suppression 100%)
+    a_outer_true = 100  # AU (suppression 0%)
     results = (np.log10(a_values) - np.log10(a_inner_true)) / (np.log10(a_outer_true) - np.log10(a_inner_true))
     return np.clip(results, a_min=0, a_max=1)
 
