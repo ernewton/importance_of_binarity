@@ -23,13 +23,28 @@ def model_binary_separations(n_stars, trunc_low=0.01, trunc_high=50000.):
     return 10.**a_values
 
 
+def a_to_snow(a_values):
+    fit = np.poly1d([0.16, 0.])
+    return fit(a_values)
+
+def suppression_factor_snow(a_values, star_teff):
+
+    diskAU = a_values*0.41 # median of the TB sample
+    snowAU = 0.00465*0.5*(star_teff/170.)**2 # for T_eq = 170K
+    
+    a_inner_true = a_to_snow(10)  # AU (suppression 100%)
+    a_outer_true = a_to_snow(100)  # AU (suppression 0%)
+    results = (np.log10(diskAU/snowAU) - np.log10(a_inner_true)) / (np.log10(a_outer_true) - np.log10(a_inner_true))
+
+    return np.clip(results, a_min=0, a_max=1)
+
 def suppression_factor_50(a_values):
     results = np.ones_like(a_values)*0.5 # 50% for everything
     results[a_values > 200] = 1. # but only <200 au
     return results
 
 def suppression_factor_simple(a_values):
-    a_inner_true = 15  # AU (suppression 100%)
+    a_inner_true = 10  # AU (suppression 100%)
     a_outer_true = 100  # AU (suppression 0%)
     results = (np.log10(a_values) - np.log10(a_inner_true)) / (np.log10(a_outer_true) - np.log10(a_inner_true))
     return np.clip(results, a_min=0, a_max=1)
