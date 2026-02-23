@@ -3,11 +3,20 @@
 import numpy as np
 import pandas as pd
 from scipy.stats import truncnorm
+from typing import Optional
 
 from sbin import parameters
 
-def model_binary_separations(n_stars, trunc_low=0.01, trunc_high=50000.):
+def model_binary_separations(
+    n_stars: int,
+    trunc_low: float = 0.01,
+    trunc_high: float = 50000.,
+    rng: Optional[np.random.Generator] = None,
+) -> np.ndarray:
+    """Return `n` random binary separations drawn from a log‑uniform distribution."""
     
+    rng = np.random.default_rng(rng)
+
     # set up parameters for the binary star distribution of a
     logmu = np.log10(40) # AU
     logsigma = 1.5 # log10(AU)
