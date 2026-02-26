@@ -49,14 +49,17 @@ class SuppressionSimulator:
     sup_function : Callable[[pd.Series], pd.Series], default ``suppression_factor``
         Function that maps a binary separation to a “survival probability”.
 
-    join_on : str, default ``'KOI'``
+    join_col : str, default ``'KOI'``
         Column name used to merge the planet catalogue with the binary‑star catalogue.
 
     prad_col : str, default ``'koi_prad'``
         Column name that stores the planet radius (in Earth radii).
 
+    teff_col : str, default ``'koi_steff'``
+        Column name that stores the stellar temperature (in K).
+
     random_state : Optional[int], default ``None``
-        Seed for NumPy’s RNG – useful for reproducibility.
+        Seed for random number generator
     """
 
     # ------------------------------------------------------------------
@@ -68,8 +71,9 @@ class SuppressionSimulator:
         separations: Optional[Iterable[float]] = None,
         sup_function: Callable[[pd.Series], pd.Series] = None,
         sup_type: str = "planets",
-        join_on: str = "KOI",
+        join_col: str = "KOI",
         prad_col: str = "koi_prad",
+        teff_col: str = "koi_steff",
         random_state: Optional[int] = None,
     ) -> None:
         
@@ -80,8 +84,9 @@ class SuppressionSimulator:
         self.separations = np.asarray(separations) if separations is not None else None
         self.sup_function = sup_function or suppression_factor   # returns the first true value
         self.sup_type = sup_type
-        self.join_on = join_on
+        self.join_col = join_col
         self.prad_col = prad_col
+        self.teff_col = teff_col
         self.radius_valley = 1.8
 
         # --------------------------------------------------------------
@@ -113,8 +118,12 @@ class SuppressionSimulator:
 
     def _init_suppression_catalog(self) -> None:
         """Create a DataFrame with one row per *unique* host star."""
-        unique_koi = self.planets_cat[self.join_on].unique()
-        self._suppression_cat = pd.DataFrame({self.join_on: unique_koi})
+        tmp = (
+            self.planets_cat
+            .drop_duplicates(subset=self.join_col, keep='first')
+            .reset_index(drop=True)
+        )
+        self._suppression_cat = tmp[[self.join_col, self.teff_col]]
 
     def _draw_separations(self) -> None:
         """Assign a binary separation to every host star (with optional jitter)."""
@@ -141,22 +150,24 @@ class SuppressionSimulator:
     def _compute_factors(self) -> None:
         """Apply the user‑supplied suppression function to the separations."""
         assert self._suppression_cat is not None, "Catalog not initialised"
-        self._suppression_cat["my_factor"] = self.sup_function(self._suppression_cat["a_values"])
+        self._suppression_cat["sup_factor"] = self.sup_function(self._suppression_cat["a_values"], 
+            star_teff = self._suppression_cat[self.teff_col]
+        )
 
     def _pick_surviving_systems(self) -> None:
         """Draw a uniform random number for each system and decide whether the whole system survives."""
         assert self._suppression_cat is not None, "Catalog not initialised"
         n_stars = len(self._suppression_cat)
         rand = self._rng.random(n_stars)                     # uniform in [0, 1)
-        self._suppression_cat["system_exists"] = rand < self._suppression_cat["my_factor"]
+        self._suppression_cat["system_exists"] = rand < self._suppression_cat["sup_factor"]
 
     def _merge_catalogs(self) -> None:
         """Attach the binary‑star information to every planet row."""
         assert self._suppression_cat is not None, "Catalog not initialised"
         self._realization = self.planets_cat.merge(
-            self._suppression_cat, on=self.join_on, how="left"
+            self._suppression_cat, on=self.join_col, how="left"
         )
-        # Initialise the planet‑existence column – we will overwrite it below
+        # Initialise the planet‑existence column
         self._realization["planet_exists"] = True
 
     def _pick_surviving_planets(self) -> None:
@@ -165,7 +176,7 @@ class SuppressionSimulator:
 
         n_planets = len(self.planets_cat)
         rand = self._rng.random(n_planets)
-        prob = self._realization["my_factor"]   
+        prob = self._realization["sup_factor"]   
         self._realization["planet_exists"] = rand < prob.values
 
     def get_results(self, suppression_style='systems', verbose=False) -> SuppressionResult:
@@ -182,7 +193,6 @@ class SuppressionSimulator:
         else:
             raise
             
-
         # --------------------------------------------------------------
         #  Radii of the survivors
         # --------------------------------------------------------------
@@ -199,7 +209,7 @@ class SuppressionSimulator:
         #  Build the per‑system counts
         # --------------------------------------------------------------
         planet_counts = (
-            obs.groupby([self.join_on, "a_values"])
+            obs.groupby([self.join_col, "a_values"])
             .size()
             .reset_index(name="n_planets")
         )

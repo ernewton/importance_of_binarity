@@ -36,8 +36,12 @@ def a_to_snow(a_values):
     fit = np.poly1d([0.16, 0.])
     return fit(a_values)
 
-def suppression_factor_snow(a_values, star_teff):
+def suppression_factor_snow(a_values, **kwargs):
 
+    star_teff = kwargs.get("star_teff")
+    if star_teff is None:
+        raise ValueError("star_teff required for the snow‑line suppression factor")
+        
     diskAU = a_values*0.41 # median of the TB sample
     snowAU = 0.00465*0.5*(star_teff/170.)**2 # for T_eq = 170K
     
@@ -47,18 +51,18 @@ def suppression_factor_snow(a_values, star_teff):
 
     return np.clip(results, a_min=0, a_max=1)
 
-def suppression_factor_50(a_values):
+def suppression_factor_50(a_values, **kwargs):
     results = np.ones_like(a_values)*0.5 # 50% for everything
     results[a_values > 200] = 1. # but only <200 au
     return results
 
-def suppression_factor_simple(a_values):
+def suppression_factor_simple(a_values, **kwargs):
     a_inner_true = 10  # AU (suppression 100%)
     a_outer_true = 100  # AU (suppression 0%)
     results = (np.log10(a_values) - np.log10(a_inner_true)) / (np.log10(a_outer_true) - np.log10(a_inner_true))
     return np.clip(results, a_min=0, a_max=1)
 
-def suppression_factor(a_values):
+def suppression_factor_mk21(a_values, **kwargs):
     """
     Return the suppression factor S for a set of orbital semi-major axes.
     
@@ -94,7 +98,7 @@ def suppression_factor(a_values):
 
 
 def suppression_simulation(planets_cat, separations=None, 
-                           sup_function = suppression_factor,
+                           sup_function = suppression_factor_mk21,
                            sup_type = 'planets',
                            join_on='KOI', prad_col='koi_prad'):
     """

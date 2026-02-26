@@ -1,12 +1,25 @@
 # ----------------------------------------------------------------------
-# Public API – make the two functions explicit
+# Public API 
 # ----------------------------------------------------------------------
-__all__ = ["get_cmax", "gap_complexity"]
+__all__ = ["create_complexity_df","gap_complexity"]
 
 
 import numpy as np
 
-def get_cmax(ngaps: int) -> float:
+def create_complexity_df(db):
+    
+    complexity_df = (db
+             .groupby('KOI')
+             .apply(lambda g: gap_complexity(g['koi_period'].values) 
+                              if len(g) >= 3 else np.nan)
+             .reset_index(name='gap_complexity')
+             .assign(n_planets=lambda df: db.groupby('KOI').size().values)
+            )
+    
+    return complexity_df
+    
+    
+def _get_cmax(ngaps: int) -> float:
     """
     Return the cmax value that corresponds to the integer N.
 
@@ -65,7 +78,7 @@ def gap_complexity(periods):
     # Normalise by the maximum possible entropy, ln(N‑1)
     disequilibrium = np.sum( (p_star  - 1/(N-1))**2 )
     
-    K = 1./get_cmax(N-1)
+    K = 1./_get_cmax(N-1)
 
     return -K * entropy * disequilibrium
 

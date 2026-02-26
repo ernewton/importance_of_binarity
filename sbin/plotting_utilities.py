@@ -1,18 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_semimajor(ax, a_values_sim):
+
+def plot_hist_confidence(ax, trials_to_plot, bins=None, 
+                         log_flag=True, density_flag=True,
+                         weights_flag=False):
     
-    log_min, log_max = 0.5, 2.0              
-    n_bins = 10                              
-    bins   = np.linspace(log_min, log_max, n_bins + 1)   # bin edges
     bin_centers = 0.5 * (bins[:-1] + bins[1:])           # for plotting
-
+    
     hists = []
-    for x in a_values_sim:
-        count, _ = np.histogram(np.log10(x), bins=bins, density=True)
+    for x in trials_to_plot:
+        if log_flag:
+            x = np.log10(x)
+        if weights_flag:
+            weights=1./np.full(len(x), len(x), dtype=float)
+        else:
+            weights=None
+        count, _ = np.histogram(x, bins=bins, density=density_flag, weights=weights)
         hists.append(count)
-
+ 
     # simulation shenanigans
     hists = np.asarray(hists)              
     median_h  = np.median(hists, axis=0)               # median density
@@ -29,13 +35,6 @@ def plot_semimajor(ax, a_values_sim):
             label='Simulated KOIs')
     ax.fill_between(bins, lower_step, upper_step, step='post',
                     color='gray', alpha=0.5)
-
-
-
-    ax.set_xlabel(r'$\log_{10}(a [au])$')
-    ax.set_ylabel('Density')
-    
-    return bins
 
 
 
