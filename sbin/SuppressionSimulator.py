@@ -23,6 +23,7 @@ class SuppressionResult:
     survived_semimajor_by_system: ArrayOrList      # semimajor axis (AU) per system
     survived_semimajor_by_planet: ArrayOrList      # semimajor axis (AU) per planet
     survived_planets_radii: ArrayOrList            # planet radius (Earth radii)    
+    survived_planets_periods: ArrayOrList # planet orbital period (d)
     frac_super_earths: float                # surviving planets with R < radius_valley
     frac_multiplanet: float                 # fraction of surviving systems that are multiplanet
 
@@ -87,6 +88,7 @@ class SuppressionSimulator:
         self.join_col = join_col
         self.prad_col = prad_col
         self.teff_col = teff_col
+        self.period_col = 'koi_period'
         self.radius_valley = 1.8
 
         # --------------------------------------------------------------
@@ -142,7 +144,7 @@ class SuppressionSimulator:
         else:
             # Fall back to the default model (you must have imported it)
             drawn = model_binary_separations(
-                n_stars, trunc_low=0.1, trunc_high=100.0, rng=self._rng
+                n_stars, trunc_low=1., trunc_high=200.0, rng=self._rng
             )
 
         self._suppression_cat["a_values"] = drawn
@@ -194,9 +196,10 @@ class SuppressionSimulator:
             raise
             
         # --------------------------------------------------------------
-        #  Radii of the survivors
+        #  Properties of the survivors
         # --------------------------------------------------------------
         planet_radius = obs[self.prad_col]
+        planet_period = obs[['KOI',self.period_col]]
 
         # --------------------------------------------------------------
         #  Fraction of “super‑Earths” (R < radius_valley) among the survivors
@@ -235,6 +238,7 @@ class SuppressionSimulator:
             survived_semimajor_by_system=planet_counts['a_values'],
             survived_semimajor_by_planet=obs['a_values'],
             survived_planets_radii=planet_radius,
+            survived_planets_periods=planet_period,
             frac_super_earths=frac_super,
             frac_multiplanet=frac_multi,
         )

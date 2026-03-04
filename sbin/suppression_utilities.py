@@ -22,13 +22,13 @@ def model_binary_separations(
     logsigma = 1.5 # log10(AU)
     trunc_low_loga = np.log10(trunc_low) # 0.01 is min shown
     trunc_high_loga = np.log10(trunc_high) # 5*10^4 AU is max a shown in Offner plot
-    trunc_high = (trunc_high_loga-logmu)/logsigma # truncates at no. of sigma from loc
-    trunc_low = (trunc_low_loga-logmu)/logsigma # truncates at no. of sigma from loc
+    trunc_high_sig = (trunc_high_loga-logmu)/logsigma # truncates at no. of sigma from loc
+    trunc_low_sig= (trunc_low_loga-logmu)/logsigma # truncates at no. of sigma from loc
 
-    a_values = truncnorm.rvs(trunc_low, trunc_high,
+    a_values = truncnorm.rvs(trunc_low_sig, trunc_high_sig,
                                     loc=logmu, scale=logsigma,
                                     size=n_stars)
-    
+
     return 10.**a_values
 
 
@@ -163,7 +163,7 @@ def suppression_simulation(planets_cat, separations=None,
 
     else:
         random_separations = model_binary_separations(n_stars,
-                                          trunc_low = 0.1, trunc_high = 100.)
+                                          trunc_low = 0.1, trunc_high = 200.)
         
 
     # Suppress planet formation (per STAR)

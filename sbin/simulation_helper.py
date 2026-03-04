@@ -85,6 +85,7 @@ def _calc_means(results):
     ssm_by_system = [r.survived_semimajor_by_system for r in results]
     ssm_by_planet = [r.survived_semimajor_by_planet for r in results]
     spr_by_planet = [r.survived_planets_radii for r in results]
+    spp_by_planet = [r.survived_planets_periods for r in results]
     
     # ------------------------------------------------------------------
     # Build the aggregated result object
@@ -95,6 +96,7 @@ def _calc_means(results):
         survived_semimajor_by_system=ssm_by_system,
         survived_semimajor_by_planet=ssm_by_planet,
         survived_planets_radii=spr_by_planet,
+        survived_planets_periods=spp_by_planet,
         frac_super_earths=mean_frac_super,
         frac_multiplanet=mean_frac_multi,
     )
