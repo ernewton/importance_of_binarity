@@ -17,6 +17,7 @@ from .SuppressionSimulator import SuppressionSimulator, SuppressionResult
 def run_trials(
     simulator: SuppressionSimulator,
     n_trials: int,
+    max_a_draw: float = 300.,
 ) -> Tuple[SuppressionResult, Optional[List[SuppressionResult]]]:
     """
     Run `n_trials` independent realizations of the same ``SuppressionSimulator``
@@ -49,7 +50,7 @@ def run_trials(
     results_planets: List[SuppressionResult] = []
 
     for _ in range(n_trials):
-        simulator.run()
+        simulator.run(max_a_draw=max_a_draw)
         results_systems.append(simulator.get_results(suppression_style="systems"))
         results_planets.append(simulator.get_results(suppression_style="planets"))
         
@@ -82,10 +83,9 @@ def _calc_means(results):
     # ------------------------------------------------------------------
     # Build trial-by-trial results
     # ------------------------------------------------------------------
-    ssm_by_system = [r.survived_semimajor_by_system for r in results]
-    ssm_by_planet = [r.survived_semimajor_by_planet for r in results]
-    spr_by_planet = [r.survived_planets_radii for r in results]
-    spp_by_planet = [r.survived_planets_periods for r in results]
+    ssm_by_planet = [r.survived_semimajor for r in results]
+    spr_by_planet = [r.survived_radii for r in results]
+    spp_by_planet = [r.survived_periods for r in results]
     
     # ------------------------------------------------------------------
     # Build the aggregated result object
@@ -93,10 +93,9 @@ def _calc_means(results):
     return SuppressionResult(
         survived_planets=all_planets, # concatenation of all planets from all trials
         planet_counts_per_system=all_counts, # concatenation of all planets from all trials
-        survived_semimajor_by_system=ssm_by_system,
-        survived_semimajor_by_planet=ssm_by_planet,
-        survived_planets_radii=spr_by_planet,
-        survived_planets_periods=spp_by_planet,
+        survived_semimajor=ssm_by_planet,
+        survived_radii=spr_by_planet,
+        survived_periods=spp_by_planet,
         frac_super_earths=mean_frac_super,
         frac_multiplanet=mean_frac_multi,
     )

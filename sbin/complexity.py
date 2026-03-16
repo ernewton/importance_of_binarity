@@ -6,14 +6,16 @@ __all__ = ["create_complexity_df","gap_complexity"]
 
 import numpy as np
 
-def create_complexity_df(db):
+def create_complexity_df(db, 
+                         period_col='koi_period',
+                         id_col='KOI'):
     
     complexity_df = (db
              .groupby('KOI')
-             .apply(lambda g: gap_complexity(g['koi_period'].values) 
+             .apply(lambda g: gap_complexity(g[period_col].values) 
                               if len(g) >= 3 else np.nan)
              .reset_index(name='gap_complexity')
-             .assign(n_planets=lambda df: db.groupby('KOI').size().values)
+             .assign(n_planets=lambda df: db.groupby(id_col).size().values)
             )
     
     return complexity_df

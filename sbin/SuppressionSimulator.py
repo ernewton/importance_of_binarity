@@ -20,10 +20,9 @@ class SuppressionResult:
     """All objects produced by a single run of :class:`SuppressionSimulator`."""
     survived_planets: pd.DataFrame          # rows = planets that survive
     planet_counts_per_system: pd.DataFrame  # KOI, a_values, n_planets
-    survived_semimajor_by_system: ArrayOrList      # semimajor axis (AU) per system
-    survived_semimajor_by_planet: ArrayOrList      # semimajor axis (AU) per planet
-    survived_planets_radii: ArrayOrList            # planet radius (Earth radii)    
-    survived_planets_periods: ArrayOrList # planet orbital period (d)
+    survived_semimajor: ArrayOrList      # semimajor axis (AU) per planet
+    survived_radii: ArrayOrList            # planet radius (Earth radii)    
+    survived_periods: ArrayOrList # planet orbital period (d)
     frac_super_earths: float                # surviving planets with R < radius_valley
     frac_multiplanet: float                 # fraction of surviving systems that are multiplanet
 
@@ -71,10 +70,10 @@ class SuppressionSimulator:
         planets_cat: pd.DataFrame,
         separations: Optional[Iterable[float]] = None,
         sup_function: Callable[[pd.Series], pd.Series] = None,
-        sup_type: str = "planets",
         join_col: str = "KOI",
         prad_col: str = "koi_prad",
         teff_col: str = "koi_steff",
+        period_col: str = "koi_period",
         random_state: Optional[int] = None,
     ) -> None:
         
@@ -84,11 +83,10 @@ class SuppressionSimulator:
         self.planets_cat = planets_cat.copy()
         self.separations = np.asarray(separations) if separations is not None else None
         self.sup_function = sup_function or suppression_factor   # returns the first true value
-        self.sup_type = sup_type
         self.join_col = join_col
         self.prad_col = prad_col
         self.teff_col = teff_col
-        self.period_col = 'koi_period'
+        self.period_col = period_col
         self.radius_valley = 1.8
 
         # --------------------------------------------------------------
@@ -105,10 +103,10 @@ class SuppressionSimulator:
     # ------------------------------------------------------------------
     #  Public entry point ------------------------------------------------
     # ------------------------------------------------------------------
-    def run(self) -> SuppressionResult:
+    def run(self, max_a_draw=300.) -> SuppressionResult:
         """Execute the full simulation and return a :class:`SuppressionResult`."""
         self._init_suppression_catalog()
-        self._draw_separations()
+        self._draw_separations(max_a_draw)
         self._compute_factors()
         self._pick_surviving_systems()
         self._merge_catalogs()
@@ -127,7 +125,7 @@ class SuppressionSimulator:
         )
         self._suppression_cat = tmp[[self.join_col, self.teff_col]]
 
-    def _draw_separations(self) -> None:
+    def _draw_separations(self, max_a_draw=300.) -> None:
         """Assign a binary separation to every host star (with optional jitter)."""
         assert self._suppression_cat is not None, "Catalog not initialised"
 
@@ -144,7 +142,7 @@ class SuppressionSimulator:
         else:
             # Fall back to the default model (you must have imported it)
             drawn = model_binary_separations(
-                n_stars, trunc_low=1., trunc_high=200.0, rng=self._rng
+                n_stars, trunc_low=1., trunc_high=max_a_draw, rng=self._rng
             )
 
         self._suppression_cat["a_values"] = drawn
@@ -199,7 +197,7 @@ class SuppressionSimulator:
         #  Properties of the survivors
         # --------------------------------------------------------------
         planet_radius = obs[self.prad_col]
-        planet_period = obs[['KOI',self.period_col]]
+        planet_period = obs[[self.join_col,self.period_col]]
 
         # --------------------------------------------------------------
         #  Fraction of “super‑Earths” (R < radius_valley) among the survivors
@@ -235,10 +233,9 @@ class SuppressionSimulator:
         return SuppressionResult(
             survived_planets=obs,
             planet_counts_per_system=planet_counts,
-            survived_semimajor_by_system=planet_counts['a_values'],
-            survived_semimajor_by_planet=obs['a_values'],
-            survived_planets_radii=planet_radius,
-            survived_planets_periods=planet_period,
+            survived_semimajor=obs['a_values'],
+            survived_radii=planet_radius,
+            survived_periods=planet_period,
             frac_super_earths=frac_super,
             frac_multiplanet=frac_multi,
         )

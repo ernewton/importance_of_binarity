@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 def plot_hist_confidence(ax, trials_to_plot, bins=None, 
                          log_flag=True, density_flag=True,
                          weights_flag=False,
-                         ci_low=16, ci_high=84):
+                         ci_low=16, ci_high=84,
+                         **kwargs):
     
     bin_centers = 0.5 * (bins[:-1] + bins[1:])           # for plotting
     
@@ -31,11 +32,15 @@ def plot_hist_confidence(ax, trials_to_plot, bins=None,
 
     #plt.hist(np.log10(median_h), bins=bins, density=True, alpha=0.2)
     # 68 % confidence band
+
+    kwargs.setdefault("color",    "gray")
+    kwargs.setdefault("lw",       4)
+    kwargs.setdefault("linestyle", ":")
+
     ax.step(bins, median_step, where='post',
-            color='gray', lw=4, linestyle=':',
-            label='Simulated KOIs')
+                **kwargs)
     ax.fill_between(bins, lower_step, upper_step, step='post',
-                    color='gray', alpha=0.5)
+                        color=kwargs.get('color'), alpha=0.4)
 
 
 
@@ -60,7 +65,12 @@ def ecdf_on_grid(sample, grid):
 
 
 def ecdf_confidence(samples):  
+    # Remove empty samples so concatenation and percentiles don't fail
+    samples = [np.asarray(s) for s in samples if len(s) > 0]
     
+    if len(samples) == 0:
+        return np.array([]), np.array([]), np.array([]), np.array([])
+
     # ---------- ECDF on a common grid ----------
     x_grid = np.sort(np.unique(np.concatenate(samples)))
     ecdf_matrix = np.vstack([ecdf_on_grid(trial, x_grid) for trial in samples])
@@ -73,17 +83,22 @@ def ecdf_confidence(samples):
     return [x_grid, lower, median, upper]
 
 
-def plot_ecdf_confidence(ax, samples, log_flag=False):
+def plot_ecdf_confidence(ax, samples, log_flag=False,
+                         **kwargs):
     
     x_grid, lower, median, upper = ecdf_confidence(samples)
     if log_flag:
         x_grid=np.log10(x_grid)
     
+
+    kwargs.setdefault("color",    "gray")
+    kwargs.setdefault("lw",       4)
+    kwargs.setdefault("linestyle", ":")
+
     # ---------- Plot ----------
     ax.step(x_grid, median, where='post',
-            color='gray', lw=3, linestyle=':',
-            label='Simulated KOIs')
+             **kwargs)
     ax.fill_between(x_grid,
                     lower, upper,
-                    step='post', color='gray', alpha=0.4)
+                    step='post', color=kwargs.get('color'), alpha=0.4)
 

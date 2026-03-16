@@ -46,7 +46,7 @@ def suppression_factor_snow(a_values, **kwargs):
     snowAU = 0.00465*0.5*(star_teff/170.)**2 # for T_eq = 170K
     
     a_inner_true = a_to_snow(10)  # AU (suppression 100%)
-    a_outer_true = a_to_snow(100)  # AU (suppression 0%)
+    a_outer_true = a_to_snow(200)  # AU (suppression 0%)
     results = (np.log10(diskAU/snowAU) - np.log10(a_inner_true)) / (np.log10(a_outer_true) - np.log10(a_inner_true))
 
     return np.clip(results, a_min=0, a_max=1)
