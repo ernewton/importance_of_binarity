@@ -1,0 +1,39 @@
+Title: Revising Properties of Planet-Host Binary Systems. III. There is 
+    No Observed Radius Gap For Kepler Planets in Binary Star Systems 
+Authors: Sullivan K., Kraus A.L., Huber D., Petigura E.A., Evans E., Dupuy T., 
+    Zhang J., Berger T.A., Gaidos E., Mann A.W. 
+Table: System parameters for each source
+================================================================================
+Byte-by-byte Description of file: ajacbdf9t2_mrt.txt
+--------------------------------------------------------------------------------
+   Bytes Format Units    Label    Explanations
+--------------------------------------------------------------------------------
+   1-  4 I4     ---      KOI      Kepler object of interest identifier
+   6- 10 F5.3   arcsec   Sep      angular separation, arcseconds
+  12- 19 I8     ---      ObsDate  Observation date, YYYYMMDD
+  21- 27 F7.4   mag      rmag     r-band magnitude
+  29- 34 F6.1   ---      SNR      Signal-to-Noise Ratio
+  36- 42 F7.3   mag      imag     SDSS i-band magnitude
+  44- 50 F7.3   mag    e_imag     ?=-99.0 Uncertainty in imag
+  52- 58 F7.3   mag      lp600    lp600 magnitude
+  60- 65 F6.2   mag    e_lp600    ?=-99.0 Uncertainty in lp600
+  67- 74 F8.4   mag      gmag     Gaia eDR3 g-band magnitude
+  76- 82 F7.3   mag    e_gmag     ?=-99.0 Uncertainty in gmag
+  84- 89 F6.2   mag      m562nm   562nm magnitude
+  91- 96 F6.2   mag    e_m562nm   ?=-99.0 Uncertainty in m562nm
+  98-104 F7.3   mag      m692nm   692nm magnitude
+ 106-112 F7.3   mag    e_m692nm   ?=-99.0 Uncertainty in m692nm
+ 114-120 F7.3   mag      m880nm   880num magnitude
+ 122-128 F7.3   mag    e_m880nm   ?=-99.0 Uncertainty in m880nm
+ 130-136 F7.3   mag      jmag     J-band magnitude
+ 138-144 F7.3   mag    e_jmag     ?=-99.0 Uncertainty in jmag
+ 146-152 F7.3   mag      hmag     H-band magnitude
+ 154-160 F7.3   mag    e_hmag     ?=-99.0 Uncertainty in hmag
+ 162-168 F7.3   mag      kpmag    K' band magnitude
+ 170-177 F8.4   mag    e_kpmag    ?=-99.0 Uncertainty in kpmag
+--------------------------------------------------------------------------------
+1695 0.31  20220806 13.516   169.0 -99.0   -99.0     0.61    0.26 -99.0    -99.0   -99.0  -99.0  -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0    
+1973 0.79  20210918 15.059   174.0 -99.0   -99.0     1.69    0.19   2.692    0.005 -99.0  -99.0  -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0     2.152   0.052  
+2005 0.023 20210616 14.233   176.0 -99.0   -99.0   -99.0   -99.0  -99.0    -99.0   -99.0  -99.0  -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0     0.644   0.041  
+5101 1.24  20210519 12.854   367.0 -99.0   -99.0     3.33    0.1  -99.0    -99.0   -99.0  -99.0  -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0   -99.0    
+4021 1.775 20210922 12.747   327.0 -99.0   -99.0     0.52    0.07 -99.0    -99.0   -99.0  -99.0  -99.0   -99.0   -99.0   -99.0     0.575   0.01  -99.0   -99.0     0.33    0.1    

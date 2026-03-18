@@ -1,0 +1,41 @@
+Title: Revising Properties of Planet-Host Binary Systems. III. There is 
+    No Observed Radius Gap For Kepler Planets in Binary Star Systems 
+Authors: Sullivan K., Kraus A.L., Huber D., Petigura E.A., Evans E., Dupuy T., 
+    Zhang J., Berger T.A., Gaidos E., Mann A.W. 
+Table: Planet parameter fit results for all planets in the binary KOI sample
+================================================================================
+Byte-by-byte Description of file: ajacbdf9t4_mrt.txt
+--------------------------------------------------------------------------------
+   Bytes Format Units   Label   Explanations
+--------------------------------------------------------------------------------
+   1-  7 A7     ---     KOI     Kepler object of interest planet identifier
+   9- 14 F6.2   Rgeo    Rppri   Planet radius, Earth units, primary as host
+  16- 20 F5.2   Rgeo  E_Rppri   Upper uncertainty in Rppri
+  22- 26 F5.2   Rgeo  e_Rppri   Lower uncertainty in Rppri
+  28- 34 F7.2   Rgeo    Rpsec   Planet radius, Earth units, secondary as host
+  36- 41 F6.2   Rgeo  E_Rpsec   Upper uncertainty in Rpsec
+  43- 48 F6.2   Rgeo  e_Rpsec   Lower uncertainty in Rpsec
+  50- 55 F6.2   Rgeo    Rpkep   Planet radius, Earth units, Kepler (1)
+  57- 61 F5.2   Rgeo  e_Rpkep   Uncertainty in Rpkep
+  63- 66 I4     K       Teqpri  Planet equilibrium temperature, secondary as host
+  68- 70 I3     K     E_Teqpri  Upper uncertainty in Teqpri
+  72- 74 I3     K     e_Teqpri  Lower uncertainty in Teqpri
+  76- 79 I4     K       Teqsec  Planet equilibrium temperature, secondary as host
+  81- 83 I3     K     E_Teqsec  Upper uncertainty in Teqsec
+  85- 87 I3     K     e_Teqsec  Lower uncertainty in Teqsec
+  89- 92 I4     K       Teqkep  Planet equilibrium temperature, Kepler (1)
+  94-101 F8.2   Sgeo    Spri    Isolation, Earth units, primary as host
+ 103-108 F6.2   Sgeo  E_Spri    Upper uncertainty in Spri
+ 110-115 F6.2   Sgeo  e_Spri    Lower uncertainty in Spri
+ 117-123 F7.2   Sgeo    Ssec    Isolation, Earth units, secondary as host
+ 125-130 F6.2   Sgeo  E_Ssec    Upper uncertainty in Ssec
+ 132-137 F6.2   Sgeo  e_Ssec    Lower uncertainty in Ssec
+ 139-146 F8.2   Sgeo    Skep    Isolation, Earth units, Kepler (1)
+ 148-155 F8.2   Sgeo  e_Skep    Uncertainty in Skep
+--------------------------------------------------------------------------------
+Note (1): Kepler values from Thompson et al. (2018) [2018ApJS..235...38T]
+--------------------------------------------------------------------------------
+1695.01   2.21  0.76  0.94    2.55   0.92   1.11   2.19  0.64  509  68  91  439  60  80  561    12.51   1.27   1.24    7.56   1.15   1.12    23.44    20.48 
+1973.01   1.81  0.20  0.21    3.75   0.40   0.41   1.49  0.12  888  45  46  543  28  28  802   120.76   5.44   5.76   25.08   1.30   1.32    97.96    29.97 
+2005.01   2.15  0.24  0.24    3.34   0.40   0.40   1.48  0.12  772  39  39  607  32  32  619    65.58   3.10   2.90   28.64   1.75   1.76    34.85    11.14 
+5101.01   1.13  0.53  0.52    2.61   1.23   1.26   1.64  0.70  285  31  32  137  15  15  331     2.84   0.05   0.05    0.22   0.02   0.02     2.84     3.55 
