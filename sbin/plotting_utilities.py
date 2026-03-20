@@ -40,7 +40,7 @@ def plot_hist_confidence(ax, trials_to_plot, bins=None,
     ax.step(bins, median_step, where='post',
                 **kwargs)
     ax.fill_between(bins, lower_step, upper_step, step='post',
-                        color=kwargs.get('color'), alpha=0.4)
+                        color=kwargs.get('color'), alpha=0.3)
 
 
 
@@ -100,5 +100,5 @@ def plot_ecdf_confidence(ax, samples, log_flag=False,
              **kwargs)
     ax.fill_between(x_grid,
                     lower, upper,
-                    step='post', color=kwargs.get('color'), alpha=0.4)
+                    step='post', color=kwargs.get('color'), alpha=0.3)
 
