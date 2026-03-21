@@ -12,6 +12,8 @@ from .suppression_utilities import model_binary_separations
 
 # ----------------------------------------------------------------------
 #  Helper: a tiny container for the results
+
+
 # ----------------------------------------------------------------------
 ArrayOrList = Union[np.ndarray, List[np.ndarray]]
 
@@ -19,12 +21,9 @@ ArrayOrList = Union[np.ndarray, List[np.ndarray]]
 class SuppressionResult:
     """All objects produced by a single run of :class:`SuppressionSimulator`."""
     survived_planets: pd.DataFrame          # rows = planets that survive
-    planet_counts_per_system: pd.DataFrame  # KOI, a_values, n_planets
-    survived_semimajor: ArrayOrList      # semimajor axis (AU) per planet
-    survived_radii: ArrayOrList            # planet radius (Earth radii)    
+    survived_systems: pd.DataFrame  # KOI, a_values, n_planets
     survived_periods: ArrayOrList # planet orbital period (d)
-    frac_super_earths: float                # surviving planets with R < radius_valley
-    frac_multiplanet: float                 # fraction of surviving systems that are multiplanet
+
 
 
 # ----------------------------------------------------------------------
@@ -232,10 +231,6 @@ class SuppressionSimulator:
         # --------------------------------------------------------------
         return SuppressionResult(
             survived_planets=obs,
-            planet_counts_per_system=planet_counts,
-            survived_semimajor=obs['a_values'],
-            survived_radii=planet_radius,
-            survived_periods=planet_period,
-            frac_super_earths=frac_super,
-            frac_multiplanet=frac_multi,
+            survived_systems=planet_counts,
+            survived_periods=planet_period
         )

@@ -54,19 +54,17 @@ def run_trials(
         results_systems.append(simulator.get_results(suppression_style="systems"))
         results_planets.append(simulator.get_results(suppression_style="planets"))
         
-    return _calc_means(results_systems), _calc_means(results_planets)
+    return _stack(results_systems), _stack(results_planets)
 
 
-def _calc_means(results):
+def _stack(results):
     
-    # number of times the sim was run
-    n_trials = len(results)
     
     # ------------------------------------------------------------------
     # Compute the means of the scalar quantities
     # ------------------------------------------------------------------
-    mean_frac_super = np.mean([r.frac_super_earths for r in results])
-    mean_frac_multi  = np.mean([r.frac_multiplanet   for r in results])
+    #mean_frac_super = np.mean([r.frac_super_earths for r in results])
+    #mean_frac_multi  = np.mean([r.frac_multiplanet   for r in results])
 
     # ------------------------------------------------------------------
     # Concatenate the DataFrames so the return type matches the class
@@ -76,26 +74,24 @@ def _calc_means(results):
         ignore_index=True,
     )
     all_counts = pd.concat(
-        [r.planet_counts_per_system for r in results],
+        [r.survived_systems for r in results],
         ignore_index=True,
     )
+
+    ssp_by_planet = [r.survived_periods for r in results]
 
     # ------------------------------------------------------------------
     # Build trial-by-trial results
     # ------------------------------------------------------------------
-    ssm_by_planet = [r.survived_semimajor for r in results]
-    spr_by_planet = [r.survived_radii for r in results]
-    spp_by_planet = [r.survived_periods for r in results]
+    #ssm_by_planet = [r.survived_semimajor for r in results]
+    #spr_by_planet = [r.survived_radii for r in results]
+    #spp_by_planet = [r.survived_periods for r in results]
     
     # ------------------------------------------------------------------
     # Build the aggregated result object
     # ------------------------------------------------------------------
     return SuppressionResult(
         survived_planets=all_planets, # concatenation of all planets from all trials
-        planet_counts_per_system=all_counts, # concatenation of all planets from all trials
-        survived_semimajor=ssm_by_planet,
-        survived_radii=spr_by_planet,
-        survived_periods=spp_by_planet,
-        frac_super_earths=mean_frac_super,
-        frac_multiplanet=mean_frac_multi,
+        survived_systems=all_counts, # concatenation of all systems from all trials
+        survived_periods=ssp_by_planet # concatenation of all periods from all trials
     )
