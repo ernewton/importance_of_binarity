@@ -8,7 +8,7 @@ from typing import Callable, Iterable, Optional, List, Union
 import numpy as np
 import pandas as pd
 
-from .suppression_utilities import model_binary_separations
+from .suppression_utilities import model_binary_separations, add_radius_suppression
 
 # ----------------------------------------------------------------------
 #  Helper: a tiny container for the results
@@ -23,6 +23,7 @@ class SuppressionResult:
     survived_planets: pd.DataFrame          # rows = planets that survive
     survived_systems: pd.DataFrame  # KOI, a_values, n_planets
     survived_periods: ArrayOrList # planet orbital period (d)
+    survived_radii: ArrayOrList   # planet radius (R_earth)
 
 
 
@@ -110,6 +111,7 @@ class SuppressionSimulator:
         self._pick_surviving_systems()
         self._merge_catalogs()
         self._pick_surviving_planets()
+        self._pick_surviving_plradius_sup()
 
     # ------------------------------------------------------------------
     #  Private helpers – one for each logical block of the original function
@@ -170,7 +172,7 @@ class SuppressionSimulator:
         self._realization["planet_exists"] = True
 
     def _pick_surviving_planets(self) -> None:
-        """Apply the radius‑dependent suppression logic."""
+        """Apply the planet suppression logic."""
         assert self._realization is not None, "Realisation not built yet"
 
         n_planets = len(self.planets_cat)
@@ -178,7 +180,24 @@ class SuppressionSimulator:
         prob = self._realization["sup_factor"]   
         self._realization["planet_exists"] = rand < prob.values
 
-    def get_results(self, suppression_style='systems', verbose=False) -> SuppressionResult:
+    def _pick_surviving_plradius_sup(self) -> None:
+        """Apply the radius‑dependent suppression logic."""
+        assert self._realization["planet_exists"] is not None, "Realisation not built yet"
+        
+        n_planets = len(self.planets_cat)
+        rand = self._rng.random(n_planets)
+        prob = self._realization["sup_factor"] 
+        prob_extra = add_radius_suppression(prob.values, 
+                                            self._realization[self.prad_col],
+                                            radius_valley=1.5)
+        self._realization["plsup_planet_exists"] = rand < prob_extra
+
+
+    def get_results(self, 
+        suppression_style='systems', 
+        radius_valley=False, 
+        verbose=False) -> SuppressionResult:
+        
         """Collect the final data frames and the derived statistics."""
         assert self._realization is not None, "Realisation not built yet"
 
@@ -186,7 +205,10 @@ class SuppressionSimulator:
         #  Choose what we keep depending on sup_type
         # --------------------------------------------------------------
         if suppression_style == "planets":
-            obs = self._realization[self._realization["planet_exists"]].copy()
+            if radius_valley is True:
+                obs = self._realization[self._realization["plsup_planet_exists"]].copy()
+            else:
+                obs = self._realization[self._realization["planet_exists"]].copy()
         elif suppression_style == "systems":
             obs = self._realization[self._realization["system_exists"]].copy()
         else:
@@ -232,5 +254,6 @@ class SuppressionSimulator:
         return SuppressionResult(
             survived_planets=obs,
             survived_systems=planet_counts,
-            survived_periods=planet_period
+            survived_periods=planet_period,
+            survived_radii=planet_radius,
         )

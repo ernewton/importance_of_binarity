@@ -48,13 +48,15 @@ def run_trials(
     # ------------------------------------------------------------------
     results_systems: List[SuppressionResult] = []
     results_planets: List[SuppressionResult] = []
+    results_plradius: List[SuppressionResult] = []
 
     for _ in range(n_trials):
         simulator.run(max_a_draw=max_a_draw)
         results_systems.append(simulator.get_results(suppression_style="systems"))
         results_planets.append(simulator.get_results(suppression_style="planets"))
+        results_plradius.append(simulator.get_results(suppression_style="planets", radius_valley=True))
         
-    return _stack(results_systems), _stack(results_planets)
+    return _stack(results_systems), _stack(results_planets), _stack(results_plradius)
 
 
 def _stack(results):
@@ -79,6 +81,7 @@ def _stack(results):
     )
 
     ssp_by_planet = [r.survived_periods for r in results]
+    spr_by_planet = [r.survived_radii for r in results]
 
     # ------------------------------------------------------------------
     # Build trial-by-trial results
@@ -93,5 +96,6 @@ def _stack(results):
     return SuppressionResult(
         survived_planets=all_planets, # concatenation of all planets from all trials
         survived_systems=all_counts, # concatenation of all systems from all trials
-        survived_periods=ssp_by_planet # concatenation of all periods from all trials
+        survived_periods=ssp_by_planet, # concatenation of all periods from all trials
+        survived_radii=spr_by_planet, # concatenation of all radii from all trials
     )
