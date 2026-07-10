@@ -60,7 +60,7 @@ def suppression_factor_simple(a_values, **kwargs):
     results = (np.log10(a_values) - np.log10(a_inner_true)) / (np.log10(a_outer_true) - np.log10(a_inner_true))
     return np.clip(results, a_min=0, a_max=1)
 
-def add_radius_suppression(S_values, radius, radius_valley):
+def add_radius_suppression(S_values, radius, radius_valley=1.5):
     #new_S_values = np.copy(S_values)
     #new_S_values[radius >= radius_valley] = S_values[radius >= radius_valley]/2.
     #new_S_values[radius < radius_valley] = S_values[radius < radius_valley]*2.
@@ -68,9 +68,10 @@ def add_radius_suppression(S_values, radius, radius_valley):
     rmin=0.1
     rmax=4.
     #results = (np.log10(radius) - np.log10(rmin)) / (np.log10(rmax) - np.log10(rmin))
-    results = 1 - (radius - rmin) / (rmax - rmin)
+    results = np.clip(1 - (radius - rmin) / (rmax - rmin), 0, 1)
+    S_radius = results / np.mean(results)
 
-    new_S_values = S_values * results
+    new_S_values = S_values * S_radius
     
     return np.clip(new_S_values, a_min=0, a_max=1)
 

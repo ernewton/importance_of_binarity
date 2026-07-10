@@ -160,7 +160,8 @@ class SuppressionSimulator:
         assert self._suppression_cat is not None, "Catalog not initialised"
         n_stars = len(self._suppression_cat)
         rand = self._rng.random(n_stars)                     # uniform in [0, 1)
-        self._suppression_cat["system_exists"] = rand < self._suppression_cat["sup_factor"]
+        self._suppression_cat["rand_system_draw"] = rand
+        self._suppression_cat["system_exists"] = rand  < self._suppression_cat["sup_factor"]
 
     def _merge_catalogs(self) -> None:
         """Attach the binary‑star information to every planet row."""
@@ -183,14 +184,15 @@ class SuppressionSimulator:
     def _pick_surviving_plradius_sup(self) -> None:
         """Apply the radius‑dependent suppression logic."""
         assert self._realization["planet_exists"] is not None, "Realisation not built yet"
-        
-        n_planets = len(self.planets_cat)
-        rand = self._rng.random(n_planets)
+        assert self._suppression_cat["rand_system_draw"] is not None, "Realisation not built yet"
+
         prob = self._realization["sup_factor"] 
-        prob_extra = add_radius_suppression(prob.values, 
-                                            self._realization[self.prad_col],
-                                            radius_valley=1.5)
-        self._realization["plsup_planet_exists"] = rand < prob_extra
+        sup_new = add_radius_suppression(prob.values, 
+                                            self._realization[self.prad_col])
+        self._realization["sup_factor_rp"] = sup_new
+        
+
+        self._realization["plsup_planet_exists"] = self._realization["rand_system_draw"] < sup_new
 
 
     def get_results(self, 
